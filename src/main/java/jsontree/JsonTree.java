@@ -128,10 +128,12 @@ public class JsonTree {
 
 					StringBuffer strBuf = new StringBuffer();
 					// strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
-					strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
+					
 					strBuf.append("Content-Disposition: form-data; name=\"" + inputName + "\"; filename=\"" + filename
 							+ "\"\r\n");
-					strBuf.append("Content-Type:" + contentType + "\r\n\r\n");
+					strBuf.append("Content-Type:" + "image/png");
+					strBuf.append("Boundary:"+BOUNDARY);
+					
 					out.write(strBuf.toString().getBytes());
 
 					DataInputStream in = new DataInputStream(new FileInputStream(file));
@@ -140,6 +142,7 @@ public class JsonTree {
 					while ((bytes = in.read(bufferOut)) != -1) {
 						out.write(bufferOut, 0, bytes);
 					}
+					
 					in.close();
 				}
 			}
