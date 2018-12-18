@@ -8,7 +8,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -17,17 +16,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.zip.GZIPInputStream;
 
 import javax.activation.MimetypesFileTypeMap;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -152,13 +144,11 @@ public class JsonTree {
 					byte[] bufferOut = new byte[1024];
 					while ((bytes = in.read(bufferOut)) != -1) {
 						out.write(bufferOut, 0, bytes);
-						System.out.print(bufferOut);
 					}
 					// out.write(strBuf.toString().getBytes());
 					strBuf = new StringBuffer();
 					strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
 					out.write(strBuf.toString().getBytes());
-					System.out.println(strBuf);
 					in.close();
 				}
 			}
@@ -235,7 +225,10 @@ public class JsonTree {
 	}
 
 	public static void main(String[] args) throws IOException {
+		Scanner in=new Scanner(System.in);
+		System.out.println("输入图片位置");
 		String filepath = "C:\\Users\\83723\\Desktop\\IMGS\\IMG\\IMG3.jpg";
+		filepath=in.nextLine();
 		String urlStr = "http://shibietu.wwei.cn/fileupload.html?op=shibietu_zhiwu";
 		Map<String, String> textMap = null;
 		Map<String, String> fileMap = new HashMap<String, String>();
