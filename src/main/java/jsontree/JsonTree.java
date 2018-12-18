@@ -55,7 +55,10 @@ public class JsonTree {
 	}
 
 	public String getJsonStr2() {
-		String fileName = String.valueOf("C:\\Users\\83723\\Desktop\\IMGS\\data.json");
+		Scanner in=new Scanner(System.in);
+		System.out.println("输入.json文件位置");
+		String filepath=in.nextLine();
+		//例如： String fileName = String.valueOf("C:\\Users\\83723\\Desktop\\IMGS\\data.json");
 		File file = new File(fileName);
 		BufferedReader reader = null;
 		String jsonStr = "";
@@ -227,7 +230,8 @@ public class JsonTree {
 	public static void main(String[] args) throws IOException {
 		Scanner in=new Scanner(System.in);
 		System.out.println("输入图片位置");
-		String filepath = "C:\\Users\\83723\\Desktop\\IMGS\\IMG\\IMG3.jpg";
+		String filepath=null;
+		//例如： String filepath = "C:\\Users\\83723\\Desktop\\IMGS\\IMG\\IMG3.jpg";
 		filepath=in.nextLine();
 		String urlStr = "http://shibietu.wwei.cn/fileupload.html?op=shibietu_zhiwu";
 		Map<String, String> textMap = null;
@@ -240,6 +244,10 @@ public class JsonTree {
 
 		JsonTree hw = new JsonTree();
 		JSONObject jsonObject = JSONObject.parseObject(ret);
+		/*
+		 * 也可以： JSONObject jsonObject = JSONObject.parseObject(hw.getJsonStr2());
+		 * 从.json文件中中读取json数据
+		 */
 		hw.analysisJson(jsonObject, "Object");
 
 	}

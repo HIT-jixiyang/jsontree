@@ -29,6 +29,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/83723/.m2/repository/com/alibaba/fastjson/1.2.47/javax.activation.jar"/>
+	<classpathentry kind="lib" path="F:/GitHub/jsontree/res/fastjson-1.2.47.jar"/>
+	<classpathentry kind="lib" path="F:/GitHub/jsontree/res/fastjson-1.2.47-sources.jar"/>
+	<classpathentry kind="lib" path="F:/GitHub/jsontree/res/javax.activation.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
