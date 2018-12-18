@@ -1,11 +1,14 @@
 package jsontree;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -14,8 +17,17 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import javax.activation.MimetypesFileTypeMap;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -127,13 +139,12 @@ public class JsonTree {
 					}
 
 					StringBuffer strBuf = new StringBuffer();
-					// strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
-					
+
+					strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
 					strBuf.append("Content-Disposition: form-data; name=\"" + inputName + "\"; filename=\"" + filename
 							+ "\"\r\n");
-					strBuf.append("Content-Type:" + "image/png");
-					strBuf.append("Boundary:"+BOUNDARY);
-					
+					strBuf.append("Content-Type:" + contentType + "\r\n\r\n");
+
 					out.write(strBuf.toString().getBytes());
 
 					DataInputStream in = new DataInputStream(new FileInputStream(file));
@@ -141,14 +152,20 @@ public class JsonTree {
 					byte[] bufferOut = new byte[1024];
 					while ((bytes = in.read(bufferOut)) != -1) {
 						out.write(bufferOut, 0, bytes);
+						System.out.print(bufferOut);
 					}
-					
+					// out.write(strBuf.toString().getBytes());
+					strBuf = new StringBuffer();
+					strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
+					out.write(strBuf.toString().getBytes());
+					System.out.println(strBuf);
 					in.close();
 				}
 			}
 
-			// byte[] endData = ("\r\n--" + BOUNDARY + "--\r\n").getBytes();
-			// out.write(endData);
+			byte[] endData = ("\r\n--" + BOUNDARY + "--\r\n").getBytes();
+			out.write(endData);
+
 			out.flush();
 			out.close();
 
@@ -174,6 +191,17 @@ public class JsonTree {
 		return res;
 	}
 
+	public static String unicodeToCn(String unicode) {
+		/** 以 \ u 分割，因为java注释也能识别unicode，因此中间加了一个空格 */
+		String[] strs = unicode.split("\\\\u");
+		String returnStr = "";
+		// 由于unicode字符串以 \ u 开头，因此分割出的第一个字符是""。
+		for (int i = 1; i < strs.length; i++) {
+			returnStr += (char) Integer.valueOf(strs[i], 16).intValue();
+		}
+		return returnStr;
+	}
+
 	@SuppressWarnings("rawtypes")
 	public void analysisJson(Object objJson, String parent_type) {
 		JSONObject jsonObject = (JSONObject) objJson;
@@ -194,19 +222,32 @@ public class JsonTree {
 		}
 	}
 
-	public static void main(String[] args) {
-		String filepath = "C:\\Users\\83723\\Desktop\\IMGS\\IMG\\IMG1.jpg";
+	public static byte[] uncompress(byte[] b) throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayInputStream in = new ByteArrayInputStream(b);
+		GZIPInputStream gunzip = new GZIPInputStream(in);
+		byte[] buffer = new byte[256];
+		int n;
+		while ((n = gunzip.read(buffer)) >= 0) {
+			out.write(buffer, 0, n);
+		}
+		return out.toByteArray();
+	}
+
+	public static void main(String[] args) throws IOException {
+		String filepath = "C:\\Users\\83723\\Desktop\\IMGS\\IMG\\IMG3.jpg";
 		String urlStr = "http://shibietu.wwei.cn/fileupload.html?op=shibietu_zhiwu";
 		Map<String, String> textMap = null;
 		Map<String, String> fileMap = new HashMap<String, String>();
 		fileMap.put("file", filepath);
-		String ret = formUpload(urlStr,fileMap);
+		String ret = formUpload(urlStr, fileMap);
 		System.out.println(ret);
-		/*
-		 * JsonTree hw = new JsonTree(); JSONObject jsonObject =
-		 * JSONObject.parseObject(hw.getJsonStr2()); hw.analysisJson(jsonObject,
-		 * "Object");
-		 */
+
+		// System.out.println(response);
+
+		JsonTree hw = new JsonTree();
+		JSONObject jsonObject = JSONObject.parseObject(ret);
+		hw.analysisJson(jsonObject, "Object");
 
 	}
 }
