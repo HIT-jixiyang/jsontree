@@ -27,38 +27,16 @@ import com.alibaba.fastjson.JSONObject;
 public class JsonTree {
 	public static int ID = 0;
 
-	public static void readFileByLines(String fileName) {
-		File file = new File(fileName);
-		BufferedReader reader = null;
-		try {
-			System.out.println("以行为单位读取文件内容，一次读一整行：");
-			reader = new BufferedReader(new FileReader(file));
-			String tempString = null;
-			int line = 1;
-			// 一次读入一行，直到读入null为文件结束
-			while ((tempString = reader.readLine()) != null) {
-				// 显示行号
-				System.out.println("line " + line + ": " + tempString);
-				line++;
-			}
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e1) {
-				}
-			}
-		}
-	}
-
+	// 从json文件中读取json字符串
 	public String getJsonStr2() {
-		Scanner in=new Scanner(System.in);
+		Scanner in = new Scanner(System.in);
 		System.out.println("输入.json文件位置");
-		String filepath=in.nextLine();
-		//例如： String fileName = String.valueOf("C:\\Users\\83723\\Desktop\\IMGS\\data.json");
+		String filepath = in.nextLine();
+		String fileName = String.valueOf(filepath);
+		/*
+		 * 例如： String fileName =
+		 * String.valueOf("C:\\Users\\83723\\Desktop\\IMGS\\data.json");
+		 */
 		File file = new File(fileName);
 		BufferedReader reader = null;
 		String jsonStr = "";
@@ -88,10 +66,13 @@ public class JsonTree {
 		return jsonStr;
 	}
 
+	// 发送图片到server，得到返回结果
 	public static String formUpload(String urlStr, Map<String, String> fileMap) {
 		String res = "";
 		HttpURLConnection conn = null;
 		String BOUNDARY = "---------------------------123821742118716"; // boundary就是request头和上传文件内容的分隔符
+
+		// 设置post request
 		try {
 			URL url = new URL(urlStr);
 			conn = (HttpURLConnection) url.openConnection();
@@ -142,6 +123,7 @@ public class JsonTree {
 
 					out.write(strBuf.toString().getBytes());
 
+					// 读取并发送文件
 					DataInputStream in = new DataInputStream(new FileInputStream(file));
 					int bytes = 0;
 					byte[] bufferOut = new byte[1024];
@@ -215,6 +197,7 @@ public class JsonTree {
 		}
 	}
 
+	// Unicode转中文
 	public static byte[] uncompress(byte[] b) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ByteArrayInputStream in = new ByteArrayInputStream(b);
@@ -228,20 +211,30 @@ public class JsonTree {
 	}
 
 	public static void main(String[] args) throws IOException {
-		Scanner in=new Scanner(System.in);
+
+		Scanner in = new Scanner(System.in);
 		System.out.println("输入图片位置");
-		String filepath=null;
-		//例如： String filepath = "C:\\Users\\83723\\Desktop\\IMGS\\IMG\\IMG3.jpg";
-		filepath=in.nextLine();
+
+		// 获得图片路径
+		String filepath = null;
+		filepath = in.nextLine();
+		// 例如： String filepath = "C:\\Users\\83723\\Desktop\\IMGS\\IMG\\IMG3.jpg";
+
+		// 识图网站API接口地址
 		String urlStr = "http://shibietu.wwei.cn/fileupload.html?op=shibietu_zhiwu";
-		Map<String, String> textMap = null;
+
+		/*
+		 *  存放图片的HashMap
+		 * HashMap<"图片名", "图片路径">
+		 */
 		Map<String, String> fileMap = new HashMap<String, String>();
 		fileMap.put("file", filepath);
+
+		//得到返回结果：json字符串
 		String ret = formUpload(urlStr, fileMap);
 		System.out.println(ret);
 
-		// System.out.println(response);
-
+		//处理返回的字符串
 		JsonTree hw = new JsonTree();
 		JSONObject jsonObject = JSONObject.parseObject(ret);
 		/*
